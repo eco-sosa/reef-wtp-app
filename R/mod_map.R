@@ -45,7 +45,7 @@ map_server <- function(id, county_sf) {
           fillOpacity = 0.85,
           color = "white", weight = 0.8,
           label = sprintf("%s: %s", county_sf$NAME, labels),
-          highlightOptions = highlightOptions(weight = 2, color = "#C76A4A",
+          highlightOptions = highlightOptions(weight = 2, color = "#C9A227",
                                               bringToFront = TRUE)
         ) |>
         addLegend("bottomright", pal = pal, values = vals,

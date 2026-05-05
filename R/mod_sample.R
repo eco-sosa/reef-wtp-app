@@ -74,7 +74,7 @@ sample_server <- function(id, choice_dat) {
     output$nep_hist <- renderPlot({
       d <- one_per()
       ggplot(d[!is.na(d$nep_score), ], aes(nep_score)) +
-        geom_histogram(binwidth = 1, fill = "#C76A4A", color = "white",
+        geom_histogram(binwidth = 1, fill = "#C9A227", color = "white",
                        alpha = 0.9) +
         labs(x = "NEP score (sum of 6 centered Likert items)",
              y = "Respondents") +

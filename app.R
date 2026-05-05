@@ -27,6 +27,7 @@ county_sf  <- readRDS("data/fl_counties.rds")
   n_obs         = sum(choice_dat$alt == 1),
   n_counties    = sum(!is.na(county_sf$n_resp) & county_sf$n_resp >= 1),
   mean_age      = mean(.one_per$age_numeric, na.rm = TRUE),
+  sd_age        = sd(.one_per$age_numeric,   na.rm = TRUE),
   mean_nep      = mean(.one_per$nep_score,   na.rm = TRUE),
   pct_coastal   = 100 * mean(.one_per$coastal == "Yes", na.rm = TRUE),
   pct_visit     = 100 * mean(.one_per$visit   == "Yes", na.rm = TRUE),
@@ -35,12 +36,16 @@ county_sf  <- readRDS("data/fl_counties.rds")
   att_fish      = 100 * model_obj$meta$attendance_shares[["fish_abundance"]]
 )
 
+emoji_icon <- function(ch) {
+  tags$span(ch, style = "font-size: 2.2rem; line-height: 1;")
+}
+
 reef_theme <- bs_theme(
   version = 5,
   bg = "#FAF7F2",
   fg = "#1A2E35",
   primary = "#0E5C6B",
-  secondary = "#C76A4A",
+  secondary = "#C9A227",
   base_font = font_google("Source Sans 3"),
   heading_font = font_google("Fraunces", wght = "500"),
   font_scale = 1.0
@@ -62,21 +67,21 @@ ui <- page_navbar(
       value_box(
         title    = "Coral outplant survival",
         value    = sprintf("$%.2f / pp", .hl_coral$med),
-        showcase = bsicons::bs_icon("water"),
+        showcase = emoji_icon("\U0001FAB8"),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_coral$lwr, .hl_coral$upr))
       ),
       value_box(
         title    = "Macroalgae reduction",
         value    = sprintf("$%.2f / pp", .hl_algae$med),
-        showcase = bsicons::bs_icon("flower3"),
+        showcase = emoji_icon("\U0001F33F"),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_algae$lwr, .hl_algae$upr))
       ),
       value_box(
         title    = "Fish abundance in restored areas",
         value    = sprintf("$%.2f / pp", .hl_fish$med),
-        showcase = bsicons::bs_icon("droplet-half"),
+        showcase = emoji_icon("\U0001F41F"),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_fish$lwr, .hl_fish$upr))
       )
@@ -103,7 +108,7 @@ and inspect model diagnostics."))
         )
       ),
       card(
-        card_header("Where respondents live"),
+        card_header("Map of Respondent Home County"),
         leafletOutput("overview_map", height = "320px")
       )
     ),
@@ -116,7 +121,8 @@ and inspect model diagnostics."))
                 showcase = bsicons::bs_icon("list-check"), theme = "secondary"),
       value_box("FL counties (n>=1)", as.character(.stats$n_counties),
                 showcase = bsicons::bs_icon("geo-alt"),    theme = "secondary"),
-      value_box("Mean age (yrs)", sprintf("%.1f", .stats$mean_age),
+      value_box("Mean age (yrs)",
+                sprintf("%.1f \U00B1 %.1f", .stats$mean_age, .stats$sd_age),
                 showcase = bsicons::bs_icon("person"),     theme = "secondary"),
       value_box("Coastal county", sprintf("%.0f%%", .stats$pct_coastal),
                 showcase = bsicons::bs_icon("water"),      theme = "light"),
@@ -166,7 +172,7 @@ server <- function(input, output, session) {
         fillOpacity = 0.85,
         color = "white", weight = 0.6,
         label = sprintf("%s: %s", county_sf$NAME, labels),
-        highlightOptions = highlightOptions(weight = 1.5, color = "#C76A4A",
+        highlightOptions = highlightOptions(weight = 1.5, color = "#C9A227",
                                             bringToFront = TRUE)
       ) |>
       addLegend("bottomright", pal = pal, values = ~n_resp,

@@ -3305,7 +3305,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "3350074eef14e99128939f9fda5470fb"
+      "checksum": "204ad5b1d692aa3c5034bd3cb416cd02"
     },
     "build_app_data.R": {
       "checksum": "4cb87d8fd6084bb32976f1e739f20fea"
@@ -3326,7 +3326,7 @@
       "checksum": "e86e92760b25ec664e87d4101ce314b4"
     },
     "R/mod_calculator.R": {
-      "checksum": "daa3d356cc8f8a390146b35d94c89112"
+      "checksum": "6f1a6dbe1a210276ad14485b6aa2406f"
     },
     "R/mod_diagnostics.R": {
       "checksum": "89f793963900cea80921d90b72fc97ee"
@@ -3335,10 +3335,10 @@
       "checksum": "05f3c0e74759a827debecef07cf8ee99"
     },
     "R/mod_map.R": {
-      "checksum": "a14b4075a660534ef2c4f916bc51759e"
+      "checksum": "233fce7c6b57f62ac634b42e6848f059"
     },
     "R/mod_sample.R": {
-      "checksum": "956a7512117b41d4f0bbd7cedc97c6a7"
+      "checksum": "7f3b2bab6ef6965af45c5a291b248a51"
     },
     "R/utils_wtp.R": {
       "checksum": "0981665d94dc852b3aa23f4c6191161a"

@@ -86,7 +86,7 @@ calculator_server <- function(id, model) {
         rv <- r()
         df <- data.frame(wtp = rv$draws)
         ggplot(df, aes(wtp)) +
-          geom_histogram(bins = 30, fill = "#C76A4A", color = "white", alpha = 0.9) +
+          geom_histogram(bins = 30, fill = "#C9A227", color = "white", alpha = 0.9) +
           geom_vline(xintercept = rv$med, linetype = "dashed",
                      color = "#0E5C6B", linewidth = 0.6) +
           labs(x = NULL, y = NULL) +
