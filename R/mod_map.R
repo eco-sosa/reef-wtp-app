@@ -1,6 +1,6 @@
 # mod_map.R ----------------------------------------------------------
-# Tab 4: county-level choropleth. County cells with n<5 respondents are
-# suppressed (NA) per the privacy rule in CLAUDE.md.
+# Tab 4: county-level choropleth. All counties with at least 1 respondent
+# are shown. Counties with no respondents are grey.
 
 map_ui <- function(id) {
   ns <- NS(id)
@@ -12,8 +12,8 @@ map_ui <- function(id) {
         choices = c("Respondent count" = "n_resp",
                     "% choosing restoration" = "pct_restoration"),
         selected = "n_resp"),
-      helpText("Counties shaded by aggregate value. Cells with fewer than",
-               "5 respondents are shown grey to protect privacy.")
+      helpText("Counties shaded by aggregate value. Counties with no",
+               "respondents are shown grey.")
     ),
     card(
       full_screen = TRUE,
@@ -32,7 +32,7 @@ map_server <- function(id, county_sf) {
       pal <- colorNumeric("viridis", domain = vals, na.color = "#DDDDDD")
 
       label_fmt <- function(v) {
-        if (is.na(v)) return("n < 5 (suppressed)")
+        if (is.na(v)) return("no respondents")
         if (var == "n_resp") return(formatC(v, format = "d"))
         sprintf("%.1f%%", v)
       }
@@ -52,7 +52,7 @@ map_server <- function(id, county_sf) {
                   title = switch(var,
                     n_resp          = "N respondents",
                     pct_restoration = "% chose restoration"),
-                  opacity = 0.9, na.label = "n < 5")
+                  opacity = 0.9, na.label = "no data")
     })
   })
 }

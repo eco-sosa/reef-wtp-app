@@ -3,16 +3,25 @@
 # build_app_data.R from CoralReef_ANA_model.rds. All attribute deltas
 # are in percentage points.
 
-# Marginal WTP for one attribute, with simulated CIs (Krinsky-Robb)
+# Marginal WTP for one attribute, with simulated CIs (Krinsky-Robb).
+# weighted = TRUE multiplies the attended-class WTP by the share of
+# respondents who attended that attribute (read from model$meta).
 wtp_marginal <- function(model, attr, cost = "cost",
-                         n_draws = 2000, ci = 0.95) {
+                         n_draws = 2000, ci = 0.95,
+                         weighted = FALSE) {
   beta  <- model$coefficients
   V     <- model$vcov
   draws <- MASS::mvrnorm(n_draws, mu = beta, Sigma = V)
   wtp_d <- -draws[, attr] / draws[, cost]
+  if (weighted) {
+    share <- model$meta$attendance_shares[[attr]]
+    if (is.null(share)) stop("No attendance share for ", attr)
+    wtp_d <- share * wtp_d
+  }
   q <- c((1 - ci) / 2, 0.5, 1 - (1 - ci) / 2)
   out <- quantile(wtp_d, q, na.rm = TRUE)
-  list(lwr = unname(out[1]), med = unname(out[2]), upr = unname(out[3]))
+  list(lwr = unname(out[1]), med = unname(out[2]), upr = unname(out[3]),
+       draws = wtp_d)
 }
 
 # WTP for a scenario (named list of attribute deltas, all in pp)

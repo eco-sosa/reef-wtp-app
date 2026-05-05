@@ -16,11 +16,11 @@ model_obj  <- readRDS("data/model_m5.rds")
 choice_dat <- readRDS("data/choice_data.rds")
 county_sf  <- readRDS("data/fl_counties.rds")
 
-# Headline marginal WTP from the loaded model (kept fresh, not hardcoded)
+# Headline weighted marginal WTP from the loaded model (live, not hardcoded)
 .hl <- list(
-  coral = wtp_marginal(model_obj, "coral_survival")$med,
-  algae = wtp_marginal(model_obj, "algae_reduction")$med,
-  fish  = wtp_marginal(model_obj, "fish_abundance")$med
+  coral = wtp_marginal(model_obj, "coral_survival",  weighted = TRUE)$med,
+  algae = wtp_marginal(model_obj, "algae_reduction", weighted = TRUE)$med,
+  fish  = wtp_marginal(model_obj, "fish_abundance",  weighted = TRUE)$med
 )
 
 reef_theme <- bs_theme(
@@ -56,11 +56,12 @@ restoration outcomes. **N = 800** Florida adults, fielded 2024,
 **3 choice tasks per respondent** (2,400 choice observations).
 
 The displayed model is an **attribute non-attendance multinomial logit**
-(ANA-MNL). Headline marginal WTP for the attended class:
+(ANA-MNL). Headline **attendance-weighted** marginal WTP (attendance share
+times attended-class WTP per percentage point):
 
-- **$%.2f** per percentage-point increase in coral survival
-- **$%.2f** per percentage-point reduction in macroalgae cover
-- **$%.2f** per percentage-point increase in reef fish abundance
+- **$%.2f / pp** coral survival increase
+- **$%.2f / pp** macroalgae reduction
+- **$%.2f / pp** reef fish abundance increase
 
 Use the tabs above to simulate scenarios, explore demographic
 heterogeneity, view geographic patterns, and inspect model diagnostics.
@@ -81,6 +82,7 @@ heterogeneity, view geographic patterns, and inspect model diagnostics.
   ),
 
   nav_panel("WTP Calculator",   calculator_ui("calc")),
+  nav_panel("Sample",           sample_ui("samp")),
   nav_panel("Heterogeneity",    heterogeneity_ui("het")),
   nav_panel("Geography",        map_ui("map")),
   nav_panel("Model Diagnostics", diagnostics_ui("diag")),
@@ -90,6 +92,7 @@ heterogeneity, view geographic patterns, and inspect model diagnostics.
 
 server <- function(input, output, session) {
   calculator_server("calc", model_obj)
+  sample_server("samp", choice_dat)
   heterogeneity_server("het", model_obj, choice_dat)
   map_server("map", county_sf)
   diagnostics_server("diag", model_obj, choice_dat)

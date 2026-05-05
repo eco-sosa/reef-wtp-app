@@ -29,6 +29,28 @@ dir.create("data", showWarnings = FALSE)
 # Apollo ANA model: estimate vector with b_*_att and b_*_nonatt pairs.
 # Repackage to the {coefficients, vcov, meta} shape utils_wtp.R reads.
 
+# Read xlsx once; we use it for attendance shares, choice_data, and demographics
+raw <- suppressWarnings(read_excel(SOURCE_XLSX))
+
+political_levels <- c(
+  "Liberal","Moderate Leaning Liberal","Moderate",
+  "Moderate Leaning Conservative","Conservative"
+)
+
+# Attendance shares from importance ratings (strict definition)
+attended <- function(x) {
+  ifelse(x %in% c("Very important", "Extremely important"), 1, 0)
+}
+resp_one <- raw %>%
+  group_by(respondent_id) %>% slice(1) %>% ungroup() %>%
+  transmute(
+    coral_survival  = attended(coral_survival_importances_dce),
+    algae_reduction = attended(algae_importance_dce),
+    fish_abundance  = attended(fish_importance_dce),
+    cost            = attended(cost_importance_dce)
+  )
+attendance_shares <- vapply(resp_one, mean, numeric(1), na.rm = TRUE)
+
 apollo_obj <- readRDS(SOURCE_MODEL)
 est <- apollo_obj$estimate
 vc  <- apollo_obj$varcov
@@ -68,15 +90,27 @@ model_m5 <- list(
       coral_survival  = "percentage points",
       algae_reduction = "percentage points",
       fish_abundance  = "percentage points"
-    )
+    ),
+    attendance_shares = attendance_shares
   )
 )
 
 saveRDS(model_m5, "data/model_m5.rds")
-cat("[1/3] data/model_m5.rds written. Headline marginal WTP:\n")
-cat(sprintf("  coral:  $%.2f / pp\n",  -beta["coral_survival"]  / beta["cost"]))
-cat(sprintf("  algae:  $%.2f / pp\n",  -beta["algae_reduction"] / beta["cost"]))
-cat(sprintf("  fish:   $%.2f / pp\n",  -beta["fish_abundance"]  / beta["cost"]))
+cat("[1/3] data/model_m5.rds written.\n")
+cat("  Attendance shares (strict):\n")
+for (a in names(attendance_shares))
+  cat(sprintf("    %-18s %.1f%%\n", a, 100 * attendance_shares[[a]]))
+cat("  Marginal WTP (attended class):\n")
+cat(sprintf("    coral:  $%.2f / pp\n",  -beta["coral_survival"]  / beta["cost"]))
+cat(sprintf("    algae:  $%.2f / pp\n",  -beta["algae_reduction"] / beta["cost"]))
+cat(sprintf("    fish:   $%.2f / pp\n",  -beta["fish_abundance"]  / beta["cost"]))
+cat("  Weighted WTP (attendance share x attended WTP):\n")
+cat(sprintf("    coral:  $%.2f / pp\n",
+            attendance_shares[["coral_survival"]]  * -beta["coral_survival"]  / beta["cost"]))
+cat(sprintf("    algae:  $%.2f / pp\n",
+            attendance_shares[["algae_reduction"]] * -beta["algae_reduction"] / beta["cost"]))
+cat(sprintf("    fish:   $%.2f / pp\n",
+            attendance_shares[["fish_abundance"]]  * -beta["fish_abundance"]  / beta["cost"]))
 
 # 2. Choice data -------------------------------------------------------
 # Long-format DCE rows + per-row demographic columns the heterogeneity
@@ -116,6 +150,16 @@ coastal_fl <- c(
   "Santa Rosa","Escambia"
 )
 
+nep_bucket <- function(x) {
+  x <- suppressWarnings(as.numeric(x))
+  case_when(
+    is.na(x)         ~ NA_character_,
+    x <= 2.66        ~ "Low NEP",
+    x <= 3.66        ~ "Mid NEP",
+    TRUE             ~ "High NEP"
+  )
+}
+
 choice_data <- raw %>%
   transmute(
     respondent_id = as.character(respondent_id),
@@ -130,10 +174,14 @@ choice_data <- raw %>%
     opt_out         = as.integer(opt_out),
     income          = income_bucket(income),
     age             = age_bucket(age),
+    age_numeric     = suppressWarnings(as.numeric(age)),
     county          = as.character(county),
     coastal         = ifelse(county %in% coastal_fl, "Yes", "No"),
     visit           = ifelse(fknms_visitation == "Never" | is.na(fknms_visitation),
-                              "No", "Yes")
+                              "No", "Yes"),
+    political_id    = factor(political_id, levels = political_levels),
+    nep_score       = suppressWarnings(as.numeric(nep_score)),
+    nep             = nep_bucket(nep_score)
   )
 
 saveRDS(choice_data, "data/choice_data.rds")
@@ -167,23 +215,16 @@ chose_share <- choice_data %>%
   summarise(mean_pct_restoration = mean(pct_picked, na.rm = TRUE), .groups = "drop")
 
 county_stats <- resp_per_county %>%
-  left_join(chose_share, by = "county") %>%
-  mutate(
-    n_resp_display = ifelse(n_resp < 5, NA_integer_, n_resp),
-    pct_restoration_display = ifelse(n_resp < 5, NA_real_, mean_pct_restoration)
-  )
+  left_join(chose_share, by = "county")
 
 fl <- fl %>%
   left_join(county_stats, by = c("NAME" = "county")) %>%
-  mutate(
-    n_resp = n_resp_display,
-    pct_restoration = pct_restoration_display
-  ) %>%
+  mutate(pct_restoration = mean_pct_restoration) %>%
   select(NAME, n_resp, pct_restoration, geometry)
 
 saveRDS(fl, "data/fl_counties.rds")
 cat("[3/3] data/fl_counties.rds written.",
-    "counties_with_data=", sum(!is.na(fl$n_resp)),
-    "suppressed_n<5=", sum(is.na(fl$n_resp) | fl$n_resp == 0), "\n")
+    "counties_with_n>=1=", sum(!is.na(fl$n_resp) & fl$n_resp >= 1),
+    "no_respondents=", sum(is.na(fl$n_resp)), "\n")
 
 cat("\nDone. App-ready files in data/.\n")

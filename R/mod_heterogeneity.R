@@ -19,6 +19,14 @@ heterogeneity_ui <- function(id) {
                   choices = c("All","Yes","No"), selected = "All"),
       selectInput(ns("visit"), "Visited FKNMS",
                   choices = c("All","Yes","No"), selected = "All"),
+      selectInput(ns("political"), "Political ideology",
+                  choices = c("All","Liberal","Moderate Leaning Liberal",
+                              "Moderate","Moderate Leaning Conservative",
+                              "Conservative"),
+                  selected = "All"),
+      selectInput(ns("nep"), "NEP score (environmental concern)",
+                  choices = c("All","Low NEP","Mid NEP","High NEP"),
+                  selected = "All"),
       hr(),
       textOutput(ns("n_filt")),
       helpText("Subgroup model is a simple MNL (no ANA, no random",
@@ -50,10 +58,12 @@ heterogeneity_server <- function(id, model, choice_dat) {
 
     filtered <- reactive({
       d <- choice_dat
-      if (input$income  != "All") d <- d[!is.na(d$income)  & d$income  == input$income,  ]
-      if (input$age     != "All") d <- d[!is.na(d$age)     & d$age     == input$age,     ]
-      if (input$coastal != "All") d <- d[!is.na(d$coastal) & d$coastal == input$coastal, ]
-      if (input$visit   != "All") d <- d[!is.na(d$visit)   & d$visit   == input$visit,   ]
+      if (input$income    != "All") d <- d[!is.na(d$income)       & d$income       == input$income,    ]
+      if (input$age       != "All") d <- d[!is.na(d$age)          & d$age          == input$age,       ]
+      if (input$coastal   != "All") d <- d[!is.na(d$coastal)      & d$coastal      == input$coastal,   ]
+      if (input$visit     != "All") d <- d[!is.na(d$visit)        & d$visit        == input$visit,     ]
+      if (input$political != "All") d <- d[!is.na(d$political_id) & as.character(d$political_id) == input$political, ]
+      if (input$nep       != "All") d <- d[!is.na(d$nep)          & d$nep          == input$nep,       ]
       d
     })
 
