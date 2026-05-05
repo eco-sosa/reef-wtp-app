@@ -16,11 +16,11 @@ model_obj  <- readRDS("data/model_m5.rds")
 choice_dat <- readRDS("data/choice_data.rds")
 county_sf  <- readRDS("data/fl_counties.rds")
 
-# Headline weighted marginal WTP from the loaded model (live, not hardcoded)
+# Headline marginal WTP from the loaded model (attended class)
 .hl <- list(
-  coral = wtp_marginal(model_obj, "coral_survival",  weighted = TRUE)$med,
-  algae = wtp_marginal(model_obj, "algae_reduction", weighted = TRUE)$med,
-  fish  = wtp_marginal(model_obj, "fish_abundance",  weighted = TRUE)$med
+  coral = wtp_marginal(model_obj, "coral_survival")$med,
+  algae = wtp_marginal(model_obj, "algae_reduction")$med,
+  fish  = wtp_marginal(model_obj, "fish_abundance")$med
 )
 
 reef_theme <- bs_theme(
@@ -56,12 +56,12 @@ restoration outcomes. **N = 800** Florida adults, fielded 2024,
 **3 choice tasks per respondent** (2,400 choice observations).
 
 The displayed model is an **attribute non-attendance multinomial logit**
-(ANA-MNL). Headline **attendance-weighted** marginal WTP (attendance share
-times attended-class WTP per percentage point):
+(ANA-MNL). Headline marginal WTP for the attended class, per percentage
+point of attribute change:
 
-- **$%.2f / pp** coral survival increase
-- **$%.2f / pp** macroalgae reduction
-- **$%.2f / pp** reef fish abundance increase
+- **$%.2f** per pp increase in coral outplant survival
+- **$%.2f** per pp reduction in macroalgae cover
+- **$%.2f** per pp increase in fish abundance in restored areas
 
 Use the tabs above to simulate scenarios, explore demographic
 heterogeneity, view geographic patterns, and inspect model diagnostics.

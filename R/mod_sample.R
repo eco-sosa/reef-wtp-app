@@ -25,7 +25,7 @@ sample_ui <- function(id) {
       ),
       card(
         full_screen = FALSE,
-        card_header("NEP score (1 = low concern, 5 = high concern)"),
+        card_header("NEP score (higher = greater environmental concern)"),
         plotOutput(ns("nep_hist"), height = "280px")
       ),
       card(
@@ -74,9 +74,10 @@ sample_server <- function(id, choice_dat) {
     output$nep_hist <- renderPlot({
       d <- one_per()
       ggplot(d[!is.na(d$nep_score), ], aes(nep_score)) +
-        geom_histogram(binwidth = 0.2, fill = "#C76A4A", color = "white",
+        geom_histogram(binwidth = 1, fill = "#C76A4A", color = "white",
                        alpha = 0.9) +
-        labs(x = "NEP score", y = "Respondents") +
+        labs(x = "NEP score (sum of 6 centered Likert items)",
+             y = "Respondents") +
         theme_minimal(base_size = 12) +
         theme(panel.grid.minor = element_blank())
     })

@@ -55,7 +55,7 @@ diagnostics_server <- function(id, model, choice_dat) {
 
     output$wtp_tbl <- renderDT({
       attrs  <- c("coral_survival","algae_reduction","fish_abundance")
-      labels <- c("Coral survival","Algae reduction","Fish abundance")
+      labels <- c("Coral outplant survival","Macroalgae reduction","Fish abundance")
       rows <- lapply(attrs, function(a) {
         w <- wtp_marginal(model, a)
         data.frame(

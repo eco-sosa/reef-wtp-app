@@ -3305,16 +3305,16 @@
   },
   "files": {
     "app.R": {
-      "checksum": "07a4c0f90472d8ce3d0ba6b61ffc1e17"
+      "checksum": "f68a3db68012644160dc6fac76aa5cf0"
     },
     "build_app_data.R": {
-      "checksum": "de060ce297e27f40a857e2e556a11f56"
+      "checksum": "4cb87d8fd6084bb32976f1e739f20fea"
     },
     "CLAUDE.md": {
       "checksum": "838b4615561f0ba4c4a45c3efb01719d"
     },
     "data/choice_data.rds": {
-      "checksum": "d546074422c27762f8397ee4c7ab2720"
+      "checksum": "bf9a227360f6ad8c67f30a62b14034c5"
     },
     "data/fl_counties.rds": {
       "checksum": "c61462cf69a6b793da02c29d9688b6e8"
@@ -3326,22 +3326,22 @@
       "checksum": "e86e92760b25ec664e87d4101ce314b4"
     },
     "R/mod_calculator.R": {
-      "checksum": "0d98d256db069c719327772702a34118"
+      "checksum": "daa3d356cc8f8a390146b35d94c89112"
     },
     "R/mod_diagnostics.R": {
-      "checksum": "3c4a9bcd3fbd87a60c72a5fb49d9a2fe"
+      "checksum": "89f793963900cea80921d90b72fc97ee"
     },
     "R/mod_heterogeneity.R": {
-      "checksum": "75d87e6ae9b7ffe0c19e321452be7852"
+      "checksum": "05f3c0e74759a827debecef07cf8ee99"
     },
     "R/mod_map.R": {
       "checksum": "a14b4075a660534ef2c4f916bc51759e"
     },
     "R/mod_sample.R": {
-      "checksum": "d029c1c64d8e56eb2fa6fb4caf4503d4"
+      "checksum": "956a7512117b41d4f0bbd7cedc97c6a7"
     },
     "R/utils_wtp.R": {
-      "checksum": "f065f02220e2158e1cde28bac63316bf"
+      "checksum": "0981665d94dc852b3aa23f4c6191161a"
     },
     "README.md": {
       "checksum": "04eb22c7c3593607fb189fa2dae9235a"

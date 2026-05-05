@@ -150,13 +150,17 @@ coastal_fl <- c(
   "Santa Rosa","Escambia"
 )
 
+# Data-driven terciles since NEP in this dataset is a sum of centered
+# Likert items (range observed: -11 to 12), not a 1-5 mean.
+nep_numeric_all <- suppressWarnings(as.numeric(raw$nep_score))
+nep_q <- quantile(nep_numeric_all, probs = c(1/3, 2/3), na.rm = TRUE)
 nep_bucket <- function(x) {
   x <- suppressWarnings(as.numeric(x))
   case_when(
-    is.na(x)         ~ NA_character_,
-    x <= 2.66        ~ "Low NEP",
-    x <= 3.66        ~ "Mid NEP",
-    TRUE             ~ "High NEP"
+    is.na(x)      ~ NA_character_,
+    x <= nep_q[1] ~ "Low NEP",
+    x <= nep_q[2] ~ "Mid NEP",
+    TRUE          ~ "High NEP"
   )
 }
 
@@ -173,8 +177,8 @@ choice_data <- raw %>%
     price           = as.numeric(price),
     opt_out         = as.integer(opt_out),
     income          = income_bucket(income),
-    age             = age_bucket(age),
     age_numeric     = suppressWarnings(as.numeric(age)),
+    age             = age_bucket(age),
     county          = as.character(county),
     coastal         = ifelse(county %in% coastal_fl, "Yes", "No"),
     visit           = ifelse(fknms_visitation == "Never" | is.na(fknms_visitation),

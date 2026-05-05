@@ -1,19 +1,21 @@
 # mod_calculator.R ---------------------------------------------------
-# Tab 2: per-attribute WTP. Each attribute has its own slider and its
-# own live WTP card. Values are weighted WTP (attendance share x
-# attended-class WTP), scaled by the slider value.
+# Tab: per-attribute WTP. Each attribute has its own slider and its
+# own live WTP card. No aggregation across attributes. Numbers are
+# attended-class marginal WTP per percentage point, scaled by the
+# slider value.
 
-attr_card <- function(ns, id_prefix, label, slider_id, min, max, step, value,
-                      data_range_lbl) {
+attr_card <- function(ns, id_prefix, label, sublabel,
+                      slider_id, min, max, step, value) {
   card(
     card_header(label),
     layout_columns(
       col_widths = c(7, 5),
       div(
-        sliderInput(ns(slider_id), data_range_lbl,
+        sliderInput(ns(slider_id), sublabel,
                     min = min, max = max, value = value, step = step,
                     width = "100%"),
-        helpText(sprintf("Range observed in survey: %s", data_range_lbl))
+        helpText(sprintf("Slider in percentage points (data range %d-%d).",
+                         min, max))
       ),
       div(
         uiOutput(ns(paste0(id_prefix, "_headline"))),
@@ -29,18 +31,24 @@ calculator_ui <- function(id) {
     div(
       style = "padding: 0.5rem 1rem 0;",
       markdown(paste(
-        "Drag a slider to see the household WTP attributable to that",
-        "attribute alone. Numbers are **weighted WTP**: the attended-class",
-        "marginal WTP scaled by the share of respondents who reported",
-        "attending to that attribute. Per-household, one-time payment."
+        "Drag a slider to see the household WTP for that **single**",
+        "attribute change. Numbers are attended-class marginal WTP per",
+        "percentage point, scaled by the slider value. Per-household,",
+        "one-time payment. No aggregation across attributes."
       ))
     ),
-    attr_card(ns, "coral", "Coral survival",
-              "coral", 0, 45, 1, 10, "0-45 pp"),
-    attr_card(ns, "algae", "Macroalgae reduction",
-              "algae", 0, 90, 1, 20, "0-90 pp"),
-    attr_card(ns, "fish",  "Reef fish abundance",
-              "fish",  0, 300, 5, 50, "0-300 pp")
+    attr_card(ns, "coral",
+              "Increase in coral outplant survival",
+              "Percentage-point increase",
+              "coral", 0, 45, 1, 10),
+    attr_card(ns, "algae",
+              "Reduction in macroalgae cover",
+              "Percentage-point reduction",
+              "algae", 0, 90, 1, 20),
+    attr_card(ns, "fish",
+              "Increase in fish abundance in restored areas",
+              "Percentage-point increase",
+              "fish",  0, 300, 5, 50)
   )
 }
 
@@ -49,15 +57,15 @@ calculator_server <- function(id, model) {
 
     render_attr <- function(id_prefix, attr_name, slider_input) {
       r <- reactive({
-        w <- wtp_marginal(model, attr_name, weighted = TRUE)
+        w <- wtp_marginal(model, attr_name)
         delta <- slider_input()
         list(
-          lwr = w$lwr * delta,
-          med = w$med * delta,
-          upr = w$upr * delta,
+          lwr    = w$lwr * delta,
+          med    = w$med * delta,
+          upr    = w$upr * delta,
           per_pp = w$med,
-          share = model$meta$attendance_shares[[attr_name]],
-          draws = w$draws * delta
+          delta  = delta,
+          draws  = w$draws * delta
         )
       })
 
@@ -70,8 +78,7 @@ calculator_server <- function(id, model) {
           tags$div(style = "color: #555; font-size: 0.9rem; margin-top: 0.25rem;",
                    sprintf("95%% CI: $%.2f - $%.2f", rv$lwr, rv$upr)),
           tags$div(style = "color: #777; font-size: 0.8rem; margin-top: 0.4rem;",
-                   sprintf("$%.2f / pp x %d pp x %.0f%% attendance",
-                           rv$per_pp / rv$share, slider_input(), 100 * rv$share))
+                   sprintf("$%.2f / pp x %d pp", rv$per_pp, rv$delta))
         )
       })
 

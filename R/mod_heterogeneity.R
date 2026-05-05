@@ -81,7 +81,7 @@ heterogeneity_server <- function(id, model, choice_dat) {
       sg <- subgroup_fit()
 
       full_df <- data.frame(
-        attribute = c("Coral survival","Algae reduction","Fish abundance"),
+        attribute = c("Coral outplant survival","Macroalgae reduction","Fish abundance"),
         med  = c(full_wtp$coral_survival$med,  full_wtp$algae_reduction$med,
                  full_wtp$fish_abundance$med),
         lwr  = c(full_wtp$coral_survival$lwr,  full_wtp$algae_reduction$lwr,
@@ -96,7 +96,7 @@ heterogeneity_server <- function(id, model, choice_dat) {
         sub <- ggplot()
       } else {
         sub_df <- data.frame(
-          attribute = c("Coral survival","Algae reduction","Fish abundance"),
+          attribute = c("Coral outplant survival","Macroalgae reduction","Fish abundance"),
           med = c(sg$wtp["coral_survival","med"],
                   sg$wtp["algae_reduction","med"],
                   sg$wtp["fish_abundance","med"]),
@@ -128,7 +128,7 @@ heterogeneity_server <- function(id, model, choice_dat) {
     output$compare_tbl <- renderDT({
       sg <- subgroup_fit()
       attrs <- c("coral_survival","algae_reduction","fish_abundance")
-      labels <- c("Coral survival","Algae reduction","Fish abundance")
+      labels <- c("Coral outplant survival","Macroalgae reduction","Fish abundance")
       full_med <- vapply(attrs, function(a) full_wtp[[a]]$med, numeric(1))
 
       if (is.null(sg)) {
