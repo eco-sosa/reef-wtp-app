@@ -36,9 +36,35 @@ county_sf  <- readRDS("data/fl_counties.rds")
   att_fish      = 100 * model_obj$meta$attendance_shares[["fish_abundance"]]
 )
 
-emoji_icon <- function(ch) {
-  tags$span(ch, style = "font-size: 2.2rem; line-height: 1;")
+svg_icon <- function(svg_str) {
+  htmltools::HTML(svg_str)
 }
+
+svg_coral <- '<svg viewBox="0 0 64 64" width="44" height="44" fill="none"
+  stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M32 60 V22"/>
+  <path d="M32 32 L22 22"/>
+  <path d="M32 32 L42 22"/>
+  <path d="M22 22 L14 16"/>
+  <path d="M22 22 L24 12"/>
+  <path d="M42 22 L50 16"/>
+  <path d="M42 22 L40 12"/>
+  <path d="M32 44 L26 38"/>
+  <path d="M32 44 L38 38"/>
+</svg>'
+
+svg_algae <- '<svg viewBox="0 0 64 64" width="44" height="44" fill="none"
+  stroke="white" stroke-width="3" stroke-linecap="round">
+  <path d="M14 60 Q10 48 18 40 Q26 32 18 22 Q10 12 14 4"/>
+  <path d="M32 60 Q28 48 36 40 Q44 32 36 22 Q28 12 32 4"/>
+  <path d="M50 60 Q46 48 54 40 Q62 32 54 22 Q46 12 50 4"/>
+</svg>'
+
+svg_fish <- '<svg viewBox="0 0 64 64" width="44" height="44" fill="white">
+  <path d="M44 32 C44 22 36 14 26 14 C16 14 8 22 8 32 C8 42 16 50 26 50 C36 50 44 42 44 32 Z"/>
+  <path d="M44 32 L58 20 L58 44 Z"/>
+  <circle cx="20" cy="28" r="2.2" fill="#0E5C6B"/>
+</svg>'
 
 reef_theme <- bs_theme(
   version = 5,
@@ -67,21 +93,21 @@ ui <- page_navbar(
       value_box(
         title    = "Coral outplant survival",
         value    = sprintf("$%.2f / pp", .hl_coral$med),
-        showcase = emoji_icon("\U0001FAB8"),
+        showcase = svg_icon(svg_coral),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_coral$lwr, .hl_coral$upr))
       ),
       value_box(
         title    = "Macroalgae reduction",
         value    = sprintf("$%.2f / pp", .hl_algae$med),
-        showcase = emoji_icon("\U0001F33F"),
+        showcase = svg_icon(svg_algae),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_algae$lwr, .hl_algae$upr))
       ),
       value_box(
         title    = "Fish abundance in restored areas",
         value    = sprintf("$%.2f / pp", .hl_fish$med),
-        showcase = emoji_icon("\U0001F41F"),
+        showcase = svg_icon(svg_fish),
         theme    = "primary",
         p(sprintf("95%% CI $%.2f - $%.2f", .hl_fish$lwr, .hl_fish$upr))
       )
